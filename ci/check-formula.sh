@@ -24,7 +24,10 @@ fi
 # them. Trusting the one formula keeps the grant as narrow as what is tested.
 brew trust --formula "$FORMULA"
 
-brew style "$TAP"
+# Just the formula: `brew style "$TAP"` also lints the shell scripts in this
+# repository against Homebrew's own bash conventions, which is not what they
+# are, and says nothing about whether the formula is correct.
+brew style "$FORMULA"
 brew audit --strict --online "$FORMULA"
 brew install --verbose --build-from-source "$FORMULA"
 brew test --verbose "$FORMULA"
