@@ -44,13 +44,24 @@ command-line build this formula depends on).
 `crowsnest block` is Linux-only — it writes nftables rules, and macOS filters
 with pf. crowsnest says so rather than failing oddly.
 
-## Releasing a new version
+## Keeping up with releases
 
-Update `url`, `sha256` and any resources in
-[Formula/crowsnest.rb](Formula/crowsnest.rb), then push. The
-[workflow](.github/workflows/tests.yml) builds and runs the formula on a real
-macOS runner, so a broken one fails here rather than on someone's machine.
+Nothing to do. [`update.yml`](.github/workflows/update.yml) checks crowsnest's
+latest release every six hours and, when the formula is behind, rewrites `url`
+and `sha256`, **builds and runs the new formula**, and only then commits. A tap
+is only ever consumed from `main`, so nothing that has not been tested lands
+there. "Run workflow" on that job picks up a release immediately rather than
+waiting for the schedule.
 
-```bash
-curl -fsSL https://github.com/t0mbo192/crowsnest/archive/refs/tags/vX.Y.Z.tar.gz | shasum -a 256
-```
+It runs here rather than being pushed from crowsnest's own release workflow
+because a GitHub Actions job can only write to its own repository unless it is
+given a personal access token — and a stored cross-repository token is a worse
+thing to own than a scheduled check.
+
+[`tests.yml`](.github/workflows/tests.yml) runs the same
+[`ci/check-formula.sh`](ci/check-formula.sh) on every push: style, audit, build
+from source, `brew test`, a check that Wireshark really is pulled in, and an
+uninstall that leaves nothing.
+
+The one thing still pinned by hand is the `maxminddb` resource. A pinned older
+version keeps working, so it does not go stale in a way that breaks anything.

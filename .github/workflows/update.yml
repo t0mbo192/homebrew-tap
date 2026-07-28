@@ -1,0 +1,55 @@
+name: update
+
+# Follow crowsnest's releases without anyone having to remember to.
+#
+# It runs here rather than being pushed from crowsnest's release workflow
+# because a workflow can only write to its own repository unless it is handed a
+# personal access token, and a stored cross-repository token is a worse thing to
+# own than a scheduled check. The cost is latency: a release is picked up within
+# six hours instead of instantly. Use "Run workflow" if you want it now.
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Point the formula at the latest release
+        id: bump
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ci/bump-to-latest.sh
+
+      # Nothing is pushed until the new formula has been built and run. A tap is
+      # only ever consumed from main, so a broken commit there is a broken
+      # `brew install` for everyone until someone notices.
+      - name: Build and test the updated formula
+        if: steps.bump.outputs.changed == 'true'
+        run: ci/check-formula.sh
+
+      - name: Commit the update
+        if: steps.bump.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "crowsnest ${{ steps.bump.outputs.version }}
+
+          Formula updated to the latest crowsnest release, built and tested
+          before this was pushed. Raised automatically by .github/workflows/update.yml."
+          git push
+
+      - name: Say what happened
+        run: |
+          if [ "${{ steps.bump.outputs.changed }}" = "true" ]; then
+            echo "Updated to crowsnest ${{ steps.bump.outputs.version }}." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Formula already matches the latest crowsnest release." >> "$GITHUB_STEP_SUMMARY"
+          fi

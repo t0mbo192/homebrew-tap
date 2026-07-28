@@ -2,6 +2,7 @@ name: brew
 
 # A formula is only known to work once Homebrew has actually built and run it,
 # so this does exactly that on a real macOS runner, on every push.
+
 on:
   push:
     branches: ["main"]
@@ -14,42 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Tap this checkout
-        run: |
-          # Homebrew finds taps by path, so linking the checkout into place
-          # tests the formula exactly as `brew tap t0mbo192/tap` would deliver
-          # it -- not a copy that has drifted.
-          tap="$(brew --repository)/Library/Taps/t0mbo192/homebrew-tap"
-          mkdir -p "$(dirname "$tap")"
-          ln -s "$GITHUB_WORKSPACE" "$tap"
-          brew tap-info t0mbo192/tap
-
-      - name: Trust the formula
-        # Homebrew requires third-party taps to be trusted before it will use
-        # what is in them. Trusting this one formula rather than the whole tap
-        # keeps the grant as narrow as what is being tested.
-        run: brew trust --formula t0mbo192/tap/crowsnest
-
-      - name: Style
-        run: brew style t0mbo192/tap
-
-      - name: Audit
-        run: brew audit --strict --online t0mbo192/tap/crowsnest
-
-      - name: Install from source
-        run: brew install --verbose --build-from-source t0mbo192/tap/crowsnest
-
-      - name: Test
-        run: brew test --verbose t0mbo192/tap/crowsnest
-
-      - name: tshark came in as a dependency
-        run: |
-          # The dependency is the reason this package exists: nobody should have
-          # to go and install Wireshark first.
-          command -v tshark
-          brew deps t0mbo192/tap/crowsnest | grep -qx wireshark
-
-      - name: Uninstall cleanly
-        run: |
-          brew uninstall t0mbo192/tap/crowsnest
-          ! command -v crowsnest
+      # Same script the updater runs before it pushes anything, so the two
+      # cannot come to different conclusions about the same formula.
+      - name: Build and test the formula
+        run: ci/check-formula.sh
