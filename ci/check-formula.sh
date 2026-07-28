@@ -41,9 +41,13 @@ command -v tshark >/dev/null || {
 brew deps "$FORMULA" | grep -qx wireshark
 
 brew uninstall "$FORMULA"
-command -v crowsnest >/dev/null && {
+# An `if`, not `cmd && { ... }`. The && form leaves the compound returning
+# non-zero when the command is absent -- which is the case being checked for --
+# and as the last statement in the script that failed the whole run on exactly
+# the path that was supposed to pass.
+if command -v crowsnest >/dev/null 2>&1; then
     printf 'crowsnest survived an uninstall\n' >&2
     exit 1
-}
+fi
 
 printf '\nformula is good\n'
