@@ -3,8 +3,8 @@ class Crowsnest < Formula
 
   desc "See which hosts a machine talks to, in plain language"
   homepage "https://github.com/t0mbo192/crowsnest"
-  url "https://github.com/t0mbo192/crowsnest/archive/refs/tags/v1.1.0.tar.gz"
-  sha256 "3c254724a76331e26374c99d7715b7f2f8c3e2ed615382377a1e1fdb90fb16f8"
+  url "https://github.com/t0mbo192/crowsnest/archive/refs/tags/v1.1.1.tar.gz"
+  sha256 "b35d7fdfe80aed37b458606f07eb256ec17d9cd2d47a7ae93e392ca6b4643fb7"
   license "MIT"
   head "https://github.com/t0mbo192/crowsnest.git", branch: "main"
 
