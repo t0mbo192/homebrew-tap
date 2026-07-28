@@ -55,12 +55,14 @@ class Crowsnest < Formula
       system bin/"crowsnest", sub, "--help"
     end
 
-    # Reading a capture is the one thing that works with no privileges, so it is
-    # the only end-to-end path a test can take. An empty file is not a capture,
-    # and the failure should say so rather than raise.
+    # Reading a capture is the one path that needs no privileges, so it is the
+    # only end-to-end route a test can take: it proves the console script, the
+    # virtualenv and the tshark this formula depends on all line up. An empty
+    # file is a capture of nothing, which tshark reads quite happily.
     touch "empty.pcapng"
-    output = shell_output("#{bin}/crowsnest read empty.pcapng 2>&1", 1)
-    assert_match(/tshark|capture|error/i, output)
+    output = shell_output("#{bin}/crowsnest read empty.pcapng")
+    assert_match "0 packets", output
+    assert_match "empty.pcapng", output
 
     # The resource above actually landed in the virtualenv.
     system libexec/"bin/python", "-c", "import maxminddb"

@@ -24,6 +24,12 @@ jobs:
           ln -s "$GITHUB_WORKSPACE" "$tap"
           brew tap-info t0mbo192/tap
 
+      - name: Trust the formula
+        # Homebrew requires third-party taps to be trusted before it will use
+        # what is in them. Trusting this one formula rather than the whole tap
+        # keeps the grant as narrow as what is being tested.
+        run: brew trust --formula t0mbo192/tap/crowsnest
+
       - name: Style
         run: brew style t0mbo192/tap
 

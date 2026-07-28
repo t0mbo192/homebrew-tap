@@ -14,6 +14,16 @@ first.
 `brew install --HEAD t0mbo192/tap/crowsnest` builds from `main` instead of the
 latest release.
 
+Homebrew warns that a third-party tap is untrusted, since a formula is code that
+runs on your machine. Say that this one is fine with:
+
+```bash
+brew trust --formula t0mbo192/tap/crowsnest
+```
+
+`brew trust t0mbo192/tap` covers the whole tap instead, including anything added
+to it later — broader, so only if you want that.
+
 ## What is crowsnest
 
 A terminal tool that reduces network traffic to the question you usually
