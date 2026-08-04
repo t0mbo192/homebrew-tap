@@ -20,9 +20,9 @@ jobs:
   bump:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - name: Point the formula at the latest release
+      - name: Bring the formula up to date
         id: bump
         env:
           GH_TOKEN: ${{ github.token }}
@@ -40,16 +40,16 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "crowsnest ${{ steps.bump.outputs.version }}
+          git commit -am "${{ steps.bump.outputs.summary }}
 
-          Formula updated to the latest crowsnest release, built and tested
-          before this was pushed. Raised automatically by .github/workflows/update.yml."
+          Formula brought up to date, then built and run before this was
+          pushed. Raised automatically by .github/workflows/update.yml."
           git push
 
       - name: Say what happened
         run: |
           if [ "${{ steps.bump.outputs.changed }}" = "true" ]; then
-            echo "Updated to crowsnest ${{ steps.bump.outputs.version }}." >> "$GITHUB_STEP_SUMMARY"
+            echo "Updated: ${{ steps.bump.outputs.summary }}." >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "Formula already matches the latest crowsnest release." >> "$GITHUB_STEP_SUMMARY"
+            echo "Formula is already current." >> "$GITHUB_STEP_SUMMARY"
           fi

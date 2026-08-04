@@ -13,7 +13,7 @@ jobs:
   formula:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # Same script the updater runs before it pushes anything, so the two
       # cannot come to different conclusions about the same formula.
